@@ -2,6 +2,18 @@ return {
  -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     config = function()
+    vim.api.nvim_set_hl(0, 'GitSignsAdd', { fg = '#7dcfff', bg = 'none' })  -- Bright cyan/blue for unstaged adds
+    vim.api.nvim_set_hl(0, 'GitSignsChange', { fg = '#e0af68', bg = 'none' })  -- Yellow for unstaged changes
+    vim.api.nvim_set_hl(0, 'GitSignsDelete', { fg = '#e0af68', bg = 'none' })  -- Yellow for unstaged deletes
+    vim.api.nvim_set_hl(0, 'GitSignsUntracked', { fg = '#9d7cd8', bg = 'none' })
+    
+    -- Staged signs (green tones to show "ready to commit")
+    vim.api.nvim_set_hl(0, 'GitSignsStagedAdd', { fg = '#9ece6a', bg = 'none' })  -- Green for staged adds
+    vim.api.nvim_set_hl(0, 'GitSignsStagedChange', { fg = '#ff9e64', bg = 'none' })  -- Orange-red for staged changes
+    vim.api.nvim_set_hl(0, 'GitSignsStagedDelete', { fg = '#f7768e', bg = 'none' })
+    
+    -- Current line blame
+    vim.api.nvim_set_hl(0, 'GitSignsCurrentLineBlame', { fg = '#565f89', italic = true })
 	require('gitsigns').setup ({
 	 signs = {
 	    add          = { text = '┃' },
@@ -27,8 +39,8 @@ return {
 	    follow_files = true
 	  },
 	  auto_attach = true,
-	  attach_to_untracked = false,
-	  current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+	  attach_to_untracked = true,
+	  current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
 	  current_line_blame_opts = {
 	    virt_text = true,
 	    virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
@@ -49,7 +61,7 @@ return {
 	    row = 0,
 	    col = 1
 	  },
-	  on_attach = function(bufrn) 
+	  on_attach = function(bufnr) 
 	        local gitsigns = require('gitsigns')
 
 		local function map(mode, l, r, opts)
@@ -102,12 +114,9 @@ return {
 			gitsigns.diffthis('~')
 		end)
 
-		map('n', '<leader>hQ', function() gitsigns.setqflist('all') end)
-		map('n', '<leader>hq', gitsigns.setqflist)
-
-		-- Toggles
-		map('n', '<leader>tb', gitsigns.toggle_current_line_blame)
-		map('n', '<leader>tw', gitsigns.toggle_word_diff)
+		map('n', '<leader>hq', function() gitsigns.setqflist('all') end)
+	
+		map('n', '<leader>hB', gitsigns.toggle_current_line_blame)
 
 		-- Text object
 		map({'o', 'x'}, 'ih', gitsigns.select_hunk)

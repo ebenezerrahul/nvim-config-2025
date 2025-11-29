@@ -1,0 +1,1 @@
+return { "trevorhauter/gitportal.nvim" }
