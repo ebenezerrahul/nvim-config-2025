@@ -88,6 +88,14 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	end
 end
 
+-- -- Compatibility shim for removed API
+-- if not vim.treesitter.ft_to_lang then
+-- 	vim.treesitter.ft_to_lang = function(ft)
+-- 		local ok, lang = pcall(vim.treesitter.language.get_lang, ft)
+-- 		return ok and lang or ft
+-- 	end
+-- end
+--
 ---@type vim.Option
 local rtp = vim.opt.rtp
 rtp:prepend(lazypath)

@@ -20,15 +20,15 @@ return {
 		-- Installs the debug adapters for you
 		"mason-org/mason.nvim",
 		"jay-babu/mason-nvim-dap.nvim",
-
-		-- Add your own debuggers here
-		"leoluz/nvim-dap-go",
 	},
 	keys = {
 		-- Basic debugging keymaps, feel free to change to your liking!
 		{
 			"<F5>",
 			function()
+				-- (Re-)reads launch.json if present
+				require("dap.ext.vscode").load_launchjs(nil, { cpptools = { "c", "cpp" } })
+				require("dap").continue()
 				require("dap").continue()
 			end,
 			desc = "Debug: Start/Continue",
@@ -121,28 +121,81 @@ return {
 		})
 
 		-- Change breakpoint icons
-		-- vim.api.nvim_set_hl(0, 'DapBreak', { fg = '#e51400' })
-		-- vim.api.nvim_set_hl(0, 'DapStop', { fg = '#ffcc00' })
-		-- local breakpoint_icons = vim.g.have_nerd_font
-		--     and { Breakpoint = '', BreakpointCondition = '', BreakpointRejected = '', LogPoint = '', Stopped = '' }
-		--   or { Breakpoint = '●', BreakpointCondition = '⊜', BreakpointRejected = '⊘', LogPoint = '◆', Stopped = '⭔' }
-		-- for type, icon in pairs(breakpoint_icons) do
-		--   local tp = 'Dap' .. type
-		--   local hl = (type == 'Stopped') and 'DapStop' or 'DapBreak'
-		--   vim.fn.sign_define(tp, { text = icon, texthl = hl, numhl = hl })
-		-- end
+		vim.api.nvim_set_hl(0, "DapBreak", { fg = "#e51400" })
+		vim.api.nvim_set_hl(0, "DapStop", { fg = "#ffcc00" })
+		local breakpoint_icons = vim.g.have_nerd_font
+				and {
+					Breakpoint = "",
+					BreakpointCondition = "",
+					BreakpointRejected = "",
+					LogPoint = "",
+					Stopped = "",
+				}
+			or {
+				Breakpoint = "●",
+				BreakpointCondition = "⊜",
+				BreakpointRejected = "⊘",
+				LogPoint = "◆",
+				Stopped = "⭔",
+			}
+		for type, icon in pairs(breakpoint_icons) do
+			local tp = "Dap" .. type
+			local hl = (type == "Stopped") and "DapStop" or "DapBreak"
+			vim.fn.sign_define(tp, { text = icon, texthl = hl, numhl = hl })
+		end
 
 		dap.listeners.after.event_initialized["dapui_config"] = dapui.open
+		dap.listeners.before.attach.dapui_config = function()
+			dapui.open()
+		end
+		dap.listeners.before.launch.dapui_config = function()
+			dapui.open()
+		end
 		dap.listeners.before.event_terminated["dapui_config"] = dapui.close
 		dap.listeners.before.event_exited["dapui_config"] = dapui.close
 
-		-- Install golang specific config
-		require("dap-go").setup({
-			delve = {
-				-- On Windows delve must be run attached or it crashes.
-				-- See https://github.com/leoluz/nvim-dap-go/blob/main/README.md#configuring
-				detached = vim.fn.has("win32") == 0,
+		dap.adapters.gdb = {
+			type = "executable",
+			command = "gdb",
+			args = { "--interpreter=dap", "--eval-command", "set print pretty on" },
+		}
+		dap.configurations.c = {
+			{
+				name = "Launch",
+				type = "gdb",
+				request = "launch",
+				program = function()
+					return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+				end,
+				args = {}, -- provide arguments if needed
+				cwd = "${workspaceFolder}",
+				stopAtBeginningOfMainSubprogram = false,
 			},
-		})
+			{
+				name = "Select and attach to process",
+				type = "gdb",
+				request = "attach",
+				program = function()
+					return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+				end,
+				pid = function()
+					local name = vim.fn.input("Executable name (filter): ")
+					return require("dap.utils").pick_process({ filter = name })
+				end,
+				cwd = "${workspaceFolder}",
+			},
+			{
+				name = "Attach to gdbserver :1234",
+				type = "gdb",
+				request = "attach",
+				target = "localhost:1234",
+				program = function()
+					return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+				end,
+				cwd = "${workspaceFolder}",
+			},
+		}
+		dap.configurations.cpp = dap.configurations.c
+		dap.configurations.rust = dap.configurations.c
 	end,
 }

@@ -53,6 +53,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
 				mappings = {
 					i = { ["<c-enter>"] = "to_fuzzy_refine" },
 				},
+				preview = {
+					treesitter = false,
+				},
 			},
 			-- pickers = {}
 			extensions = {
