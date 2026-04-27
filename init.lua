@@ -8,6 +8,7 @@ require("vim._core.ui2").enable({
 		msg = { height = 0.5 },
 	},
 })
+
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 

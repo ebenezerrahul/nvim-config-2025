@@ -93,7 +93,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
 		vim.keymap.set("n", "<leader>sw", withDropdown(builtin.grep_string), { desc = "[S]earch current [W]ord" })
 		vim.keymap.set("n", "<leader>sg", function()
 			-- builtin.spell_suggest
-			term = vim.fn.input("Grep >")
+			local term = vim.fn.input("Grep >")
 			builtin.grep_string(require("telescope.themes").get_ivy({
 				winblend = 0,
 				previewer = true,
