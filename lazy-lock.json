@@ -9,6 +9,7 @@
   "compiler-explorer.nvim": { "branch": "master", "commit": "523c6a7a3d8c034b421a71eb20b0da75b0b16f62" },
   "conform.nvim": { "branch": "master", "commit": "dca1a190aa85f9065979ef35802fb77131911106" },
   "diffview.nvim": { "branch": "main", "commit": "4516612fe98ff56ae0415a259ff6361a89419b0a" },
+  "fff.nvim": { "branch": "main", "commit": "6645a68ebc1f1a0dc98c1669a7e3f6d91625f79f" },
   "fidget.nvim": { "branch": "main", "commit": "889e2e96edef4e144965571d46f7a77bcc4d0ddf" },
   "friendly-snippets": { "branch": "main", "commit": "6cd7280adead7f586db6fccbd15d2cac7e2188b9" },
   "gitportal.nvim": { "branch": "main", "commit": "0c3e1c1d518c9e42e61e8df35ea0c0582a278a65" },
